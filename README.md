@@ -10,4 +10,4 @@ source: 'git clone https://git.suckless.org/dmenu'
 4. dmenu- numbers patch (, highlight patch (don't rlly like it), password patch (-P), instant patch (-n), highpriority patch (-hp items)
 
 Make sure to use the command
-rm ~/.cache/dmenu_run if no options show up on dmenu_run
+'rm ~/.cache/dmenu_run' if no options show up on dmenu_run
