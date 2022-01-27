@@ -25,6 +25,8 @@
                              * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
 #define LENGTH(X)             (sizeof X / sizeof X[0])
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
+#define NUMBERSMAXDIGITS      100
+#define NUMBERSBUFSIZE        (NUMBERSMAXDIGITS * 2) + 1
 
 /* enums */
 enum { SchemeNorm, SchemeSel, SchemeOut, SchemeLast }; /* color schemes */
@@ -35,10 +37,11 @@ struct item {
 	int out;
 };
 
+static char numbers[NUMBERSBUFSIZE] = "";
 static char text[BUFSIZ] = "";
 static char *embed;
 static int bh, mw, mh;
-static int inputw = 0, promptw;
+static int inputw = 0, promptw, passwd = 0;
 static int lrpad; /* sum of left and right padding */
 static size_t cursor;
 static struct item *items = NULL;
@@ -132,11 +135,27 @@ drawitem(struct item *item, int x, int y, int w)
 }
 
 static void
+recalculatenumbers()
+{
+	unsigned int numer = 0, denom = 0;
+	struct item *item;
+	if (matchend) {
+		numer++;
+		for (item = matchend; item && item->left; item = item->left)
+			numer++;
+	}
+	for (item = items; item && item->text; item++)
+		denom++;
+	snprintf(numbers, NUMBERSBUFSIZE, "%d/%d", numer, denom);
+}
+
+static void
 drawmenu(void)
 {
 	unsigned int curpos;
 	struct item *item;
-	int x = 0, y = 0, w;
+	int x = 0, y = 0, fh = drw->fonts->h, w;
+	char *censort;
 
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	drw_rect(drw, 0, 0, mw, mh, 1, 1);
@@ -148,14 +167,20 @@ drawmenu(void)
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
 	drw_setscheme(drw, scheme[SchemeNorm]);
-	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
+	if (passwd) {
+	        censort = ecalloc(1, sizeof(text));
+		memset(censort, '.', strlen(text));
+		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0);
+		free(censort);
+	} else drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
 	if ((curpos += lrpad / 2 - 1) < w) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		drw_rect(drw, x + curpos, 2, 2, bh - 4, 1, 0);
+		drw_rect(drw, x + curpos, 2 + (bh - fh) / 2, 2, fh - 4, 1, 0);
 	}
 
+	recalculatenumbers();
 	if (lines > 0) {
 		/* draw vertical list */
 		for (item = curr; item != next; item = item->right)
@@ -170,13 +195,15 @@ drawmenu(void)
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right)
-			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">")));
+			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">") - TEXTW(numbers)));
 		if (next) {
 			w = TEXTW(">");
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, ">", 0);
+			drw_text(drw, mw - w - TEXTW(numbers), 0, w, bh, lrpad / 2, ">", 0);
 		}
 	}
+	drw_setscheme(drw, scheme[SchemeNorm]);
+	drw_text(drw, mw - TEXTW(numbers), 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
 	drw_map(drw, win, 0, 0, mw, mh);
 }
 
@@ -540,6 +567,11 @@ readstdin(void)
 	char buf[sizeof text], *p;
 	size_t i, imax = 0, size = 0;
 	unsigned int tmpmax = 0;
+	if(passwd){
+    	inputw = lines = 0;
+    	return;
+  	}
+
 
 	/* read each line from stdin and add it to the item list */
 	for (i = 0; fgets(buf, sizeof buf, stdin); i++) {
@@ -630,6 +662,7 @@ setup(void)
 
 	/* calculate menu geometry */
 	bh = drw->fonts->h + 2;
+	bh = MAX(bh,lineheight);	/* make a menu line AT LEAST 'lineheight' tall */
 	lines = MAX(lines, 0);
 	mh = (lines + 1) * bh;
 #ifdef XINERAMA
@@ -710,7 +743,7 @@ setup(void)
 static void
 usage(void)
 {
-	fputs("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
+	fputs("usage: dmenu [-bfivP] [-l lines] [-h height] [-p prompt] [-fn font] [-m monitor]\n"
 	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n", stderr);
 	exit(1);
 }
@@ -769,11 +802,17 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
-		} else if (i + 1 == argc)
+		} else if (!strcmp(argv[i], "-P"))   /* is the input a password */
+			passwd = 1;
+		else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
 		else if (!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
 			lines = atoi(argv[++i]);
+		else if (!strcmp(argv[i], "-h")) { /* minimum height of one menu line */
+			lineheight = atoi(argv[++i]);
+			lineheight = MAX(lineheight, min_lineheight);
+		}
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
