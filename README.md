@@ -20,8 +20,6 @@ source: `git clone https://git.suckless.org/dmenu`
        - use -n flag to immediately select the only matching option left
     - <b>Mouse support patch</b>
       - dmenu options are mouse clickable
-    - <b>Textscroll / scroll patch</b>
-      - adds support for text scrolling, it doesn't append '...' for long input 
     - <b>navhistory patch</b>
       - uses vimkeys to view the previous and next options in history
 
