@@ -16,7 +16,6 @@ source: `git clone https://git.suckless.org/dmenu`
     - <b>Password patch</b> (-P)
       - uses asterisks '*' instead of dots '.'
     - <b>Highpriority patch</b> (-hp items)
-    - <b>numbers patch</b>
     - <b>instant patch (-n)</b>
        - use -n flag to immediately select the only matching option left
     - <b>Mouse support patch</b>
