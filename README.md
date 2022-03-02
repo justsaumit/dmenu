@@ -21,7 +21,7 @@ source: `git clone https://git.suckless.org/dmenu`
     - <b>Mouse support patch</b>
       - dmenu options are mouse clickable
     - <b>navhistory patch</b>
-      - uses vimkeys to view the previous and next options in history
+      - uses alt + vimkeys to view the previous and next options in history
 
 ### Debugging
 Make sure to use the command `rm ~/.cache/dmenu_run` if no options show up on dmenu_run
