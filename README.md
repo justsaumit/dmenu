@@ -14,7 +14,7 @@ source: `git clone https://git.suckless.org/dmenu`
 3. <b>Xresources patch</b> and changes in dmenu.c for consistent colorschemes
 4. <b>Additional patches:</b> [<i>source</i>](https://tools.suckless.org/dmenu/patches/)
     - <b>Password patch</b> (-P)
-      - uses asterisks '*' instead of dots'.'
+      - uses asterisks '*' instead of dots '.'
     - <b>Highpriority patch</b> (-hp items)
     - <b>numbers patch</b>
     - <b>instant patch (-n)</b>
@@ -24,7 +24,7 @@ source: `git clone https://git.suckless.org/dmenu`
     - <b>Textscroll / scroll patch</b>
       - adds support for text scrolling, it doesn't append '...' for long input 
     - <b>navhistory patch</b>
-      - uses vimkeys to view the previous and next history
+      - uses vimkeys to view the previous and next options in history
 
 ### Debugging
 Make sure to use the command `rm ~/.cache/dmenu_run` if no options show up on dmenu_run
