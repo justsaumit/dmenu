@@ -12,7 +12,8 @@ source: `git clone https://git.suckless.org/dmenu`
 
 2. <b>Fonts</b> - JetBrains mono and Joypixels
 3. <b>Xresources patch</b> and changes in dmenu.c for consistent colorschemes
-4. <b>Additional patches:</b> [<i>source</i>](https://tools.suckless.org/dmenu/patches/)
+4. <b> dmenu_exclude</b> removes dmenu options for dmenu_run. Useful to include terminal only commands and/or eliminating highpriority options that may interfere with the intended one
+5. <b>Additional patches:</b> [<i>source</i>](https://tools.suckless.org/dmenu/patches/)
     - <b>Password patch</b> (-P)
       - uses asterisks '*' instead of dots '.'
     - <b>Highpriority patch</b> (-hp items)
