@@ -1,3 +1,5 @@
+4chget
+dc
 du
 mount
 umount
@@ -5,6 +7,6 @@ tr
 trash
 pic
 picom
-btsnoop
+pass
 xev
 
