@@ -8,5 +8,15 @@ trash
 pic
 picom
 pass
+start-pulseaudio-x11
+startx
+stat
+stdbuf
+stest
+stream
+stramzip
+strings
+strip
+stty
 xev
 
