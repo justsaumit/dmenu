@@ -1,4 +1,3 @@
-config.h
 dmenu
 dmenu.o
 drw.o
