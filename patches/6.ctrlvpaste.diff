@@ -1,0 +1,30 @@
+diff --git a/dmenu.1 b/dmenu.1
+index a54abdf..428b713 100644
+--- a/dmenu.1
++++ b/dmenu.1
+@@ -176,6 +176,8 @@ Paste from primary X selection
+ .TP
+ .B C\-Y
+ Paste from X clipboard
++.B C\-V
++Paste from X clipboard
+ .TP
+ .B M\-b
+ Move cursor to the start of the current word
+diff --git a/dmenu.c b/dmenu.c
+index 61f6af6..0167c19 100644
+--- a/dmenu.c
++++ b/dmenu.c
+@@ -554,7 +554,11 @@ keypress(XKeyEvent *ev)
+ 		case XK_Y:
+ 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
+ 			                  utf8, utf8, win, CurrentTime);
+-			return;
++		case XK_v: /* paste selection */
++		case XK_V:
++			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
++			                  utf8, utf8, win, CurrentTime);
++	return;
+ 		case XK_Left:
+ 		case XK_KP_Left:
+ 			movewordedge(-1);
