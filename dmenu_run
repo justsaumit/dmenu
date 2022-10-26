@@ -1,2 +1,2 @@
 #!/bin/sh
-dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
+dmenu_path | grep -vw -f /usr/local/bin/dmenu_exclude | dmenu "$@" | ${SHELL:-"/bin/sh"} &
